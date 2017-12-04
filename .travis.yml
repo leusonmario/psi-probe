@@ -1,13 +1,28 @@
+
+sudo: required
 language: java
-sudo: false
+
 jdk:
 - oraclejdk8
 - oraclejdk7
 - openjdk7
-after_success:
-- chmod -R 777 ./travis/after_success.sh
-- "./travis/after_success.sh"
-env:
-  global:
-  - secure: v7aD00cje5ZqZ/Oq8mtZzjfsGNVNI23RAw9aUl0KHymIWi6/ARhfMf5gOR40g8CGPQEXgv6CTQfJlTKohvObZFD1unjoI2htrN5qK3kct2PaY1i/tgQRk6HTvei+VIXXb72HTDUTyPlevt1gk1bCUBZlxlj3rSwI140/ryd/ySU=
-  - secure: R1P1NYZiVyNp1ZOK+zugM2ZJFG17FMIV3g7kZarwP14MbqMm9ix4r3YC1UX5/vEXQoOMM7xwOeCYWIXgUQZMOOqU12DqTOk8QXoG881mGqUooAFVq/KEwEmQvH107/9a5/q5n+Wp7/xF/BZ8k5uKRzyrnr5p6mmQ4AFnHes12sw=
+
+
+script:
+  - mvn clean cobertura:cobertura -Dtest=ApplicationSessionTest#javabeanTester -DfailIfNoTests=false
+
+before_deploy:
+- tar -zcvf coverage-result.tar.gz /home/travis/build/leusonmario/psi-probe/target/site/cobertura
+
+deploy:
+  provider: releases
+  api_key:
+    secure: "0lswp/R9Cxnt5y2gI781MaNxRf7XS7csJqNaPi0fGc9q2SHLXJxSiN4ClROIZxy7WIYbxCTT/2cGur2vs9MYz4kjk9zjQzu7eEa8cudSdzTksK8NIpKLzOvpcaspeLMFYqZgQMY9+9Q8M6lqOe5hgK2ANy2R0xu8NArD8ble53TiO1yv31ov5V2ODEGlH1JtrLhxZ5BxYRFXwuaBy2vamTyWV7hhKwgIMvJhOIpkJMRUUgkTdJ5KB8Djc0RSNgS8Uspe+PKBs5CukLUt5taCM5uv7iDIfBFaADdbQ7zapZuwWk9557ximTk9yzQDNfk2H0JT/O4u5wECvVr/5QaYIBjMmu48Vv/+32o9gUiMLpwS9eYa0bqa47j8EEO5TDI8Gl5FxSARWLGAHyTUnkYpIo2m3/7h/j1MCSY+XK706p6j79Ufjv6+Mv2qm9nM7j7LEuMdfucpaAotPhI6ms+jfDT58+HQsXjC1z7VW3j3ikup5eOSPq62ZqQ7flhEeBXz1hSfznfFyrmhmdvO6EcS6FenOpsKcJAaZgI9n6gAteLSsKPRkFUfHCTUVAjau72rlD5gZuH6fyMtBXDAldnFilcVcL5zOfyJTVygbkXHIPrlWnWDp2LsDMkMJ98EFu8vFzIUTjcH9MGZ8spAs2mkkZdjHcItJroyLXZum1T9170="
+
+
+  file: coverage-result.tar.gz
+  file_glob: true
+  overwrite: true
+  skip_cleanup: true
+  on:
+    tags: true
